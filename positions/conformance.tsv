@@ -1,0 +1,52 @@
+# 入玉宣言法 24点法 適合性テスト集合 (tools/make_conformance.py が生成)
+# 実戦局面ではなく、測りたい量だけを動かすために空の盤に構成した合成局面。
+# 期待値は engine/ の実装ではなく、条文から書き起こした ref_declaration() が付けた。
+# 列: sfen <TAB> 宣言側(b/w) <TAB> 分類 <TAB> 期待 <TAB> 敵陣枚数 <TAB> 宣言点数 <TAB> 玉が敵陣 <TAB> 王手 <TAB> 手数 <TAB> 説明
+#   期待: win=宣言勝ち / draw=指し直し / -=宣言してはいけない(宣言すれば負け)
+#   分類 ply は第5項の手数条件。現行 engine_decl24.declaration() は手数を見ない。
+RRBB+P+P+P+P+P/+P8/4K4/9/9/9/8k/9/9 b 5P 1	b	win	win	10	31	1	0	1	先手 31点ちょうど・10枚ちょうど (勝ちの下限)
+RRBB+P+P+P+P+P/+P8/4K4/9/9/9/8k/9/9 b 6P 1	b	win	win	10	32	1	0	1	先手 32点
+RRBB+P+P+P+P+P/+P+P+P6/4K4/9/9/9/8k/9/9 b 10P 1	b	win	win	12	38	1	0	1	先手 余裕のある勝ち
+RRBB+P+P+P+P+P/+P+P+P+P+P+P3/4K4/9/9/9/8k/9/9 b 2P 1	b	win	win	15	33	1	0	1	先手 枚数過剰
+RRBB+P+P+P+P+P/+P8/4K4/9/9/9/8k/9/9 b 4P 1	b	draw	draw	10	30	1	0	1	先手 30点 (無勝負の上限)
+RRB+P+P+P+P+P+P/+P8/4K4/9/9/9/8k/9/9 b 2P 1	b	draw	draw	10	24	1	0	1	先手 24点ちょうど (無勝負の下限)
+RRBB+P+P+P+P+P/+P8/4K4/9/9/9/8k/9/9 b P 1	b	draw	draw	10	27	1	0	1	先手 27点 = 27点法なら勝ち、24点法では指し直し
+RRBB+P+P+P+P+P/+P8/4K4/9/9/9/8k/9/9 b 2P 1	b	draw	draw	10	28	1	0	1	先手 28点 = 27点法の先手勝ち、24点法では指し直し
+RRB+P+P+P+P+P+P/+P8/4K4/9/9/9/8k/9/9 b P 1	b	lose_points	-	10	23	1	0	1	先手 23点 (宣言すれば負けの上限)
+RRB+P+P+P+P+P+P/+P8/4K4/9/9/9/8k/9/9 b - 1	b	lose_points	-	10	22	1	0	1	先手 22点
++P+P+P+P+P+P+P+P+P/+P8/4K4/9/9/9/8k/9/9 b - 1	b	lose_points	-	10	10	1	0	1	先手 10点
++P+P+P+P+P+P+P+P+P/+P+P+P+P+P+P+P+P+P/4K4/9/9/9/8k/9/9 b - 1	b	lose_points	-	18	18	1	0	1	先手 18枚すべてと金で18点 (枚数は最大級だが点数が足りない)
+RRBB+P+P+P+P+P/9/4K4/9/9/9/8k/9/9 b 6P 1	b	lose_count	-	9	31	1	0	1	先手 9枚 (あと1枚足りない・点数は足りている)
+RRBB+P+P+P+P+P/9/4K4/9/9/9/8k/9/9 b 13P 1	b	lose_count	-	9	38	1	0	1	先手 9枚・38点
+RRBB+P4/9/4K4/9/9/9/8k/9/9 b 12P 1	b	lose_count	-	5	33	1	0	1	先手 5枚
+9/9/4K4/9/9/9/8k/9/9 b 2R2B18P 1	b	lose_count	-	0	38	1	0	1	先手 0枚 (全部持ち駒)
+RRBB+P+P+P+P+P/+P8/9/9/4K4/9/7k1/9/9 b 5P 1	b	lose_king	-	10	31	0	0	1	先手 玉が敵陣外 (枚数・点数は足りている)
+RRBB+P+P+P+P+P/+P+P+P6/9/9/4K4/9/7k1/9/9 b 10P 1	b	lose_king	-	12	38	0	0	1	先手 玉が敵陣外・余裕のある点数
+RRBB+P+P+P+P+P/+P3l4/4K4/9/9/9/8k/9/9 b 5P 1	b	lose_check	-	10	31	1	1	1	先手 王手中 (他の条件はすべて満たす)
+RRBB+P+P+P+P+P/+P+P+P1l4/4K4/9/9/9/8k/9/9 b 10P 1	b	lose_check	-	12	38	1	1	1	先手 王手中・余裕のある点数
+RRBB+P+P+P+P+P/+P8/4K4/9/9/9/8k/9/9 b 5P 501	b	ply	-	10	31	1	0	501	先手 501手目 = 既に500手指了。宣言法は使えない
+RRBB+P+P+P+P+P/+P8/4K4/9/9/9/8k/9/9 b 5P 600	b	ply	-	10	31	1	0	600	先手 600手目
+RRBB+P+P+P+P+P/+P8/4K4/9/9/9/8k/9/9 b 5P 500	b	ply	win	10	31	1	0	500	先手 500手目 = 499手指了。まだ使える
+7K1/9/9/9/9/9/rrbbk+p+p+p+p/+p+p7/9 w 5p 1	w	win	win	10	31	1	0	1	後手 31点ちょうど・10枚ちょうど (勝ちの下限)
+7K1/9/9/9/9/9/rrbbk+p+p+p+p/+p+p7/9 w 6p 1	w	win	win	10	32	1	0	1	後手 32点
+7K1/9/9/9/9/9/rrbbk+p+p+p+p/+p+p+p+p5/9 w 10p 1	w	win	win	12	38	1	0	1	後手 余裕のある勝ち
+7K1/9/9/9/9/9/rrbbk+p+p+p+p/+p+p+p+p+p+p+p2/9 w 2p 1	w	win	win	15	33	1	0	1	後手 枚数過剰
+7K1/9/9/9/9/9/rrbbk+p+p+p+p/+p+p7/9 w 4p 1	w	draw	draw	10	30	1	0	1	後手 30点 (無勝負の上限)
+7K1/9/9/9/9/9/rrb+pk+p+p+p+p/+p+p7/9 w 2p 1	w	draw	draw	10	24	1	0	1	後手 24点ちょうど (無勝負の下限)
+7K1/9/9/9/9/9/rrbbk+p+p+p+p/+p+p7/9 w p 1	w	draw	draw	10	27	1	0	1	後手 27点 = 27点法なら勝ち、24点法では指し直し
+7K1/9/9/9/9/9/rrbbk+p+p+p+p/+p+p7/9 w 2p 1	w	draw	draw	10	28	1	0	1	後手 28点 = 27点法の先手勝ち、24点法では指し直し
+7K1/9/9/9/9/9/rrb+pk+p+p+p+p/+p+p7/9 w p 1	w	lose_points	-	10	23	1	0	1	後手 23点 (宣言すれば負けの上限)
+7K1/9/9/9/9/9/rrb+pk+p+p+p+p/+p+p7/9 w - 1	w	lose_points	-	10	22	1	0	1	後手 22点
+8K/9/9/9/9/9/+p+p+p+pk+p+p+p+p/+p+p7/9 w - 1	w	lose_points	-	10	10	1	0	1	後手 10点
+8K/9/9/9/9/9/+p+p+p+pk+p+p+p+p/+p+p+p+p+p+p+p+p+p/+p8 w - 1	w	lose_points	-	18	18	1	0	1	後手 18枚すべてと金で18点 (枚数は最大級だが点数が足りない)
+7K1/9/9/9/9/9/rrbbk+p+p+p+p/+p8/9 w 6p 1	w	lose_count	-	9	31	1	0	1	後手 9枚 (あと1枚足りない・点数は足りている)
+7K1/9/9/9/9/9/rrbbk+p+p+p+p/+p8/9 w 13p 1	w	lose_count	-	9	38	1	0	1	後手 9枚・38点
+7K1/9/9/9/9/9/rrbbk+p3/9/9 w 12p 1	w	lose_count	-	5	33	1	0	1	後手 5枚
+8K/9/9/9/9/9/4k4/9/9 w 2r2b18p 1	w	lose_count	-	0	38	1	0	1	後手 0枚 (全部持ち駒)
+8K/9/9/9/4k4/9/rrbb+p+p+p+p+p/+p8/9 w 5p 1	w	lose_king	-	10	31	0	0	1	後手 玉が敵陣外 (枚数・点数は足りている)
+8K/9/9/9/4k4/9/rrbb+p+p+p+p+p/+p+p+p6/9 w 10p 1	w	lose_king	-	12	38	0	0	1	後手 玉が敵陣外・余裕のある点数
+7K1/9/9/9/9/9/rrbbk+p+p+p+p/+p+p2L4/9 w 5p 1	w	lose_check	-	10	31	1	1	1	後手 王手中 (他の条件はすべて満たす)
+7K1/9/9/9/9/9/rrbbk+p+p+p+p/+p+p+p+pL4/9 w 10p 1	w	lose_check	-	12	38	1	1	1	後手 王手中・余裕のある点数
+7K1/9/9/9/9/9/rrbbk+p+p+p+p/+p+p7/9 w 5p 501	w	ply	-	10	31	1	0	501	後手 501手目 = 既に500手指了。宣言法は使えない
+7K1/9/9/9/9/9/rrbbk+p+p+p+p/+p+p7/9 w 5p 600	w	ply	-	10	31	1	0	600	後手 600手目
+7K1/9/9/9/9/9/rrbbk+p+p+p+p/+p+p7/9 w 5p 500	w	ply	win	10	31	1	0	500	後手 500手目 = 499手指了。まだ使える
