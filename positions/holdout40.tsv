@@ -1,0 +1,43 @@
+# 相入玉が成立した瞬間の局面 (両玉が敵陣三段目以内に入った最初の局面)
+# 出典: floodgate (wdoor) https://wdoor.c.u-tokyo.ac.jp/shogi/ の公開棋譜から機械抽出
+# 列: sfen <TAB> 成立手数 <TAB> 先手の敵陣枚数 <TAB> 先手の宣言点数 <TAB> 後手の敵陣枚数 <TAB> 後手の宣言点数 <TAB> 出典棋譜名
+7+R1/6+R1+P/K+P+N1+P4/2+BP5/1SG3G2/P1P4g1/2+p+b2+p+n+p/7k1/5+p2+s w 2SLPg2n3l7p 232	231	6	18	7	24	wdoor+floodgate-300-10F+nibanshibori_v05_RTX3060+suisho5_12900K_16t+20220827153008.csa
+1+R4+B1K/5pG2/p+R1+P3pp/1sp4n1/Pssp5/4PP2P/k2S5/1+p4p2/2N6 b B2G2N3L5Pgl 233	232	5	34	2	4	wdoor+floodgate-300-10F+JK_FGbook_1c+Cendrillon+20201224143005.csa
+2S5l/1K4+P2/1P5p1/+R2p1p2p/2N2s3/2P2b1+pP/PGNk+r4/9/L3+n3L b B3GNL6P2s2p 139	138	3	19	2	10	wdoor+floodgate-300-10F+AobaZero_w1537_n_p200_t4+Krist_483_473stb_100k+20200722190007.csa
+9/2+P5+P/1+LK3p2/3P5/2SN1p1sp/2GN5/4P1+b2/6gk1/+R1+p2+r3 w G2SN2L5Pbgnl5p 170	169	3	14	4	25	wdoor+floodgate-300-10F+elmo_WCSC27_479_1000k+AobaZero_w4421_kld_avg_3200p+20240831163004.csa
++N4+R3/2+N2+B1P1/K2+P5/9/P1G4s1/7ps/1P3+n+p+r+l/1G3sk2/L1P1+n2g+b w GS2L3P8p 224	223	6	21	8	24	wdoor+floodgate-300-10F+Krist_483_473stb_1000k+AobaZero_w4083_n_p800+20220718050004.csa
+6+R1l/l2SG4/3+N2KPp/1+S2p+NS2/3pg4/1+pP6/1k4P1P/2+p5L/1+p1+r3N1 w B2GSN3Pbl5p 188	187	5	21	3	18	wdoor+floodgate-300-10F+yuatan+xg_kpe9+20210207160007.csa
+l5+N2/5p+B2/3K4+L/p1P3p2/1l2+R4/PP7/1bgsP4/1p1+p2g2/L1ks1+r3 w 2G2S3N6P3p 198	197	3	20	8	19	wdoor+floodgate-300-10F+Sora_Ginko+YOV800-peta4M-3700X+20231220090001.csa
+5+R1+N1/K+S1+P5/1+P1+P1+L1g1/3SP4/1G5p1/1P1+b3+s1/2+p2+p2k/7+b1/1+r6+p b G3N2L7Pgsl2p 177	176	7	24	5	18	wdoor+floodgate-300-10F+rearu-2000.20+craft_Percy_MT2020_CB_F+20200705103008.csa
++S3S2gl/2K6/p2+R2+Ps1/1+BG1ppp1p/5n1+r1/1l5+pP/P3+nk3/7P1/+b2P4+n b GSN4Pg2l3p 195	194	4	15	3	13	wdoor+floodgate-300-10F+Kristallweizen-Core2Duo-P7450+audio25+20220711223003.csa
+3G+R4/4KG3/3+B3pl/1s4p1p/1pn6/2p3P2/pk7/1+l2P+r3/8+n b B2G3S2NL9Plp 203	202	4	34	4	10	wdoor+floodgate-300-10F+AobaZero_w3273_n_p800+Krist_483_473stb_1000k+20210306100005.csa
+3+S1+R3/1+PK4+B1/1+S+PPp4/6P2/3gg3p/5p1G1/2+r1k2P1/+l3+s2g1/9 b NL3Pbs3n2l7p 189	188	7	20	4	26	wdoor+floodgate-300-10F+Krist_483_473stb_16t_100m+Qhapaq_WCSC28_Mizar_4790k+20200605000004.csa
+2+R6/3n+P2+B1/2+S3+B1K/1pn3SP1/+R1pP1pGG1/3p5/1+p4+pNP/L3k4/4+p3L w 2G2SN2L6Pp 236	235	5	30	3	4	wdoor+floodgate-300-10F+AobaZero_w3663_n_p800+suisho4kai_603kai2_20k+20210909003004.csa
+8+R/3K5/3+N1SG2/1+R5S1/2P2+n1pp/PGG4+s1/7k1/3+b1+n2+l/5+b3 b S3L6Pgn8p 233	232	4	18	4	22	wdoor+floodgate-300-10F+Karimero+Athletics+20231010003010.csa
+6gnl/2G2g3/2K1p1n2/p2P3sp/9/P1P1+B3P/4Ppk2/6+r2/L7L b S5Prbg2s2nl4p 223	222	1	7	2	26	wdoor+floodgate-300-10F+elmo_WCSC27_479_100k+AobaZero_w1175_n_p800+20200526103009.csa
+6p1l/K5g2/3P1pnsp/2+R4s1/4+BP3/1N2p1PP1/P6k+r/2G1P2+p1/L1G5+p b BG2S2N2L4P2p 211	210	1	17	3	9	wdoor+floodgate-300-10F+SV-037+LD+20240216120003.csa
+7+R1/8l/p+PK+L1+P2n/9/PGP2l2p/1NS4N1/1g2G1Psk/1+b1P5/5P+r2 w SL8Pbgsnp 236	235	4	18	4	21	wdoor+floodgate-300-10F+Lladro+test_i7-8550U+20241026130006.csa
+8K/+L8/4p1n2/3ps2gp/P7P/9/4P+p2k/3+b5/1P1N3s1 b 2rb3g2s2n3l10p 181	180	1	1	3	42	wdoor+floodgate-300-10F+Krist_483_473stb_100k+AobaZero_w1185_n_p800+20200529063008.csa
+4K1+R2/3+S+L2p1/8p/1+P7/2pp1pp2/1P1g2+s2/Pk3P2+r/2+l1P4/3+s5 b 2B2GS4NL5Pgl2p 159	158	3	30	3	11	wdoor+floodgate-300-10F+AobaZero_w3553_n_p800+Krist_483_473stb_1000k+20210622063004.csa
++N8/9/1K+N+N5/4p4/2+B5+r/P1P1P1+sb1/1P1P1+p3/1S1G1+p1+lk/L1GG1+r3 w GSN2L5Ps5p 146	145	3	13	4	14	wdoor+floodgate-300-10F+Frieren+Sora_Ginko+20240408050004.csa
++N6+P1/K+S1p5/1Np1p4/P8/1PP3ppp/3G2+p2/1NS1+p+b1k+l/1GG3+b2/LN1+l1r3 b RGL3P2s3p 227	226	4	14	6	23	wdoor+floodgate-300-10F+Qhapaq_WCSC29_8c+Kristallweizen_R9-3950X+20210915073005.csa
+9/+N4+N1p1/1K+P2+L3/1Pp+B2g2/L2N2g1L/1LPP5/2S2g+p1k/2+n1+r2+r1/5b3 b 5Pg3s6p 215	214	4	9	6	28	wdoor+floodgate-300-10F+suisho4kai650_10000k_4t+BBridges_i7-10750H+20211020033008.csa
+l6nl/5+R1g1/pK+SRp2pp/5p3/3p1nP2/P1Ps5/3+bs1k1P/6+n2/L1G5L w B2GS7Pnp 166	165	3	26	3	9	wdoor+floodgate-300-10F+AobaZero_w3129_n_RTX3090x2+Yss1000k+20210127050007.csa
+nB4+N2/p+P2+P2+L1/3K+R4/6G2/3N2G1+R/P4+pP+p1/6s1P/3G2+b1k/LL7 w 3SNL10Pg 248	247	6	29	2	7	wdoor+floodgate-300-10F+Sora_Ginko+Test-N+20240515133003.csa
++N6nl/5+Pss1/K+L2pp2p/2S4p1/3GG1L2/1P2P4/Pb2+pPk1P/9/3r3+rL b Pb2gs2n6p 157	156	3	4	4	32	wdoor+floodgate-300-10F+Yss1000k+AobaZero_w3296_n_t4+20210314080007.csa
+2p4+P1/K+S2P4/l+L+P1+R+P1p1/2Gp2p2/9/p2+B1g2+b/1+r3k+ln+s/5+n3/+p6L1 b 2S2P2g2n6p 245	244	7	15	6	20	wdoor+floodgate-300-10F+Krist_483_473stb_1000k+AobaZero_w4213_n_p800+20230114213006.csa
+2S5l/S6B1/2K6/1Np2Lp1p/lp7/2PP4P/1P2B1LP1/1+r3sk1G/6+p1G w RS3N3P2g5p 218	217	3	19	3	14	wdoor+floodgate-300-10F+Aerial+Sora_Ginko+20240120050006.csa
+1+R5+Pl/3+R5/K2S5/L8/3P4p/1Psg2l1P/3N3+p1/7p1/1N3+l2k w 2B3G2S2N11P 228	227	4	40	3	3	wdoor+floodgate-300-10F+AobaZero_w1195_n_p800+Krist_483_473stb_100k+20200530000008.csa
+l7l/1P7/1+P2K+P+P+L1/3P5/4pP3/1g1p5/pk+b1P2S1/2g3S1P/2b+r2g2 w RG2s4nl7p 254	253	5	11	6	32	wdoor+floodgate-300-10F+Krist_483_473stb_1000k+AobaZero_w3603_n_p800+20210724190004.csa
+2G3R2/2+PK+B4/p2p+P2g1/6s2/1P+r6/P7l/4kb+p2/4g4/9 b G2S4N3L7Ps4p 237	236	5	30	3	12	wdoor+floodgate-300-10F+ma_dlW32-TRT_V28-58_3080ti+s5_y710_Cortex-A53_4c+20220516110003.csa
+8l/p5+B2/1s1g1+PK1p/2p5s/2P6/3l1p1+RP/1+lk1+p1G1L/6PN1/5r3 b B2G2S3N8Pp 197	196	2	26	3	8	wdoor+floodgate-300-10F+Kristallweizen_R9-3950X+SNOW_WHITE+20210808100007.csa
++S7+P/2p4+N1/+BK3p3/p2Pp3p/3N2+R2/1P2P2gP/P1+r2P1+sk/3+l3+s1/L8 w 2N2L4Pb3gs2p 194	193	4	16	4	19	wdoor+floodgate-300-10F+Yss1000k+AobaZero_w1885_n_p800+20200909113005.csa
+l8/1P1+N2s2/p+R1Sp1n1K/1rB1gn3/2lp2Pp1/L4P3/P2kP+B2P/1G7/1+p3G2L b S7Pgsn 249	248	4	16	1	4	wdoor+floodgate-300-10F+AobaZero_w2289_n_t4+elmo_WCSC27_479_1000k+20201030220007.csa
+8R/2+N6/+SK+N2p3/P1+R4+Pp/2SGGn3/1G1+p4l/2g+bs4/1P1+l+b1+l2/L5k2 w N8Ps4p 244	243	4	17	6	19	wdoor+floodgate-300-10F+Sora_Ginko+Aerial+20240129023005.csa
+5+N2l/2+B6/3ppKS2/3s2+R1p/2p2g3/1P3N1P1/2k1+n1P1P/1+s+b2P3/4g3L w RGN2L7Pgs2p 240	239	3	23	4	12	wdoor+floodgate-300-10F+Kristallweizen-Core2Duo-P7450+YaOu_V605_nnue_1115+20211119180006.csa
+1+L5nl/4+Pg3/1K3p1pp/3R2p2/1N2S2P1/+r1BS5/1P6P/3+p5/3kg2NL w B2GSN5Psl4p 154	153	2	16	2	8	wdoor+floodgate-300-10F+Asari+Krist_483_473stb_16t_100m+20200417003003.csa
+ln1+R5/2+S2n3/5K+P2/pP5p1/3p1S3/L2+p5/P3kS3/1+B3P1P1/L2+b5 w R3G2NL6Pgs3p 220	219	3	24	1	10	wdoor+floodgate-300-10F+Sagittarius+Kristallweizen-i7-4578U+20210320190011.csa
+1+P4S1l/4G4/K+BG1+R1ngp/7p1/5sP2/2pPn4/1N6P/1Lk1+b4/L7L w R2SN9Pg2p 158	157	6	31	1	8	wdoor+floodgate-300-10F+HKPE9+Krist_483_473stb_16t_100m+20200322190012.csa
+l2+P4l/1G4+R2/pSKP2+R2/3Sp3p/1p3B3/Ps2N2nP/2P+p1p3/1P1+pk4/L6NL w GSN3Pb2g2p 236	235	6	20	3	12	wdoor+floodgate-300-10F+NTH+Aerial+20240214193004.csa
+9/+P3+P2+SG/p1+Pp3K1/8p/9/4pNP1P/P1pPsPSP1/2+r2lp2/Lk5+rL w S2NL3P2b3gn 168	167	5	12	6	28	wdoor+floodgate-300-10F+Yss1000k+AobaZero_w3193_n_p800+20210215133004.csa
++P5+P2/2KP+PS3/1+R+P1+P2p1/p1P5l/4+r2P1/PP7/4pk+p2/2+p2+l3/6+p2 b 2BG2S2NLP3gs2nlp 257	256	8	29	5	13	wdoor+floodgate-300-10F+AobaZero_w1671_n_p200_t4+Krist_483_473stb_100k+20200808080002.csa

@@ -1,0 +1,43 @@
+{
+ "names": [
+  "own",
+  "own_x",
+  "dec",
+  "zone_n",
+  "zone_pot",
+  "zone_x",
+  "king_in",
+  "hang_all",
+  "hang_zone",
+  "safe_drop",
+  "threat"
+ ],
+ "w": [
+  35.813,
+  3.856,
+  6.184,
+  26.365,
+  12.477,
+  6.65,
+  399.31,
+  -0.304,
+  -10.185,
+  4.434,
+  5.159
+ ],
+ "init": [
+  20.0,
+  4.0,
+  10.0,
+  25.0,
+  12.0,
+  6.0,
+  400.0,
+  -18.0,
+  -12.0,
+  2.0,
+  6.0
+ ],
+ "iters": 58,
+ "note": "SPSA 58 iterations, depth2, 40 positions, 100-ply cap. Held-out win rate 77.8% vs INIT_W."
+}
