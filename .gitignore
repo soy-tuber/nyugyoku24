@@ -15,3 +15,9 @@ nyugyoku_dataset/
 csa*/
 wdoor*.7z
 *.csa
+
+# 他人のデータセットからの派生物は同梱しない
+# (penguinkumimanu/nyugyoku24points は license 未指定のため、生成器だけを置く)
+# 生成: python tools/fetch_conformance_real.py
+positions/conformance_real.tsv
+pool_*.bin
