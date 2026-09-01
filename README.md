@@ -73,8 +73,11 @@ engine/       相入玉エンジン一式
   tune_spsa.py       SPSA による重みの自動調整
   engine24.py        持将棋 (合意) 用。数え方が違う別ルール
 tools/        データセット構築と解析
+  make_conformance.py        適合性テスト集合の生成 (合成。宣言すれば負ける陰性側)
+  fetch_conformance_real.py  同 (実戦由来の陽性側。HuggingFace から層化サンプリング)
+  probe_dlshogi_nyugyoku.py  dlshogi の入玉用入力特徴の実測
 positions/    floodgate から抽出した相入玉局面 (ベンチマーク用)
-tests/        入玉宣言法の規則テスト
+tests/        入玉宣言法の規則テストと、24点法の適合性テスト
 weights/      調整済みの重み
 docs/         解説 (GitHub Pages)
 ```
