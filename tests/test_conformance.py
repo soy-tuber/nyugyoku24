@@ -22,8 +22,9 @@ USI では宣言は `bestmove win` で表現される。
 
 実行:  python tests/test_conformance.py
        python tests/test_conformance.py --no-engine    # 判定だけ
+       python tests/test_conformance.py --real         # 実戦由来の集合も
 """
-import os, sys, time
+import os, sys, time, collections
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, '..', 'engine'))
@@ -31,6 +32,7 @@ import cshogi
 from engine_decl24 import declaration, zone_stats, DeclEngine24
 
 SUITE = os.path.join(HERE, '..', 'positions', 'conformance.tsv')
+REAL = os.path.join(HERE, '..', 'positions', 'conformance_real.tsv')
 
 FAIL = []
 INFO = []
@@ -174,12 +176,78 @@ def t_engine(rows, depth=1):
     print('  info 所要 %.1f 秒' % (time.perf_counter() - t0))
 
 
+def load_real():
+    rows = []
+    with open(REAL, encoding='utf-8') as f:
+        for ln in f:
+            if ln.startswith('#') or not ln.strip():
+                continue
+            c = ln.rstrip('\n').split('\t')
+            rows.append({'sfen': c[0],
+                         'color': cshogi.BLACK if c[1] == 'b' else cshogi.WHITE,
+                         'cat': c[2], 'want': c[3], 'p': int(c[5]),
+                         'v27': c[10], 'desc': c[11]})
+    return rows
+
+
+def t_real(depth=1):
+    """実戦由来の集合 (positions/conformance_real.tsv) でエンジンの挙動を測る。
+
+    こちらは全局面が陽性側 (手番側が宣言できる) なので、測るのは
+      - 24点法で宣言勝ちの局面で、実際に宣言するか
+      - 27点法なら勝ちだが24点法では指し直しの帯 (判別帯) で、勝ちを宣言しないか
+    後者が27点法のエンジンとの分かれ目である。
+    """
+    if not os.path.exists(REAL):
+        print('\n[3] 実戦由来の集合 — %s が無いので省略' % os.path.relpath(REAL))
+        print('    生成: python tools/fetch_conformance_real.py')
+        return
+    rows = load_real()
+    print('\n[3] 実戦由来の集合 — %d 局面 (depth %d)' % (len(rows), depth))
+    eng = DeclEngine24(max_depth=depth)
+    t0 = time.perf_counter()
+    groups = {'win': [], '判別draw': [], '一致draw': []}
+    for r in rows:
+        k = 'win' if r['want'] == 'win' else r['cat']
+        groups.setdefault(k, []).append(r)
+
+    missed = []
+    for r in groups.get('win', []):
+        mv, sc, nd = eng.go(cshogi.Board(r['sfen']))
+        if mv != 'declare_win':
+            missed.append(r['desc'])
+    check(not missed, '24点法で宣言勝ちの %d 局面で宣言する (見逃し %d)'
+          % (len(groups.get('win', [])), len(missed)))
+
+    for k, title in (('判別draw', '判別帯 (27点法なら勝ち・24点法は指し直し)'),
+                     ('一致draw', '両ルールとも勝ちでない帯')):
+        rs = groups.get(k, [])
+        if not rs:
+            continue
+        kinds = collections.Counter()
+        wrong = []
+        for r in rs:
+            mv, sc, nd = eng.go(cshogi.Board(r['sfen']))
+            kinds[mv if isinstance(mv, str) else '指し継ぐ'] += 1
+            if mv == 'declare_win':
+                wrong.append(r['desc'])
+        if k == '判別draw':
+            check(not wrong, '%s %d局面で宣言勝ちを主張しない (違反 %d)' % (title, len(rs), len(wrong)))
+            for m in wrong[:5]:
+                print('       %s' % m)
+        print('  info %s %d局面の選択: %s'
+              % (title, len(rs), ', '.join('%s=%d' % kv for kv in sorted(kinds.items()))))
+    print('  info 所要 %.1f 秒' % (time.perf_counter() - t0))
+
+
 if __name__ == '__main__':
     rows = load()
     t_suite(rows)
     t_declaration(rows)
     if '--no-engine' not in sys.argv:
         t_engine(rows)
+        if '--real' in sys.argv:
+            t_real()
     print('\n' + '=' * 60)
     for m in INFO:
         print(m)
