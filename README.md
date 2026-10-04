@@ -72,6 +72,7 @@ engine/       相入玉エンジン一式
   roles.py           攻撃側/防御側の役割固定と攻防入れ替え判定
   tune_spsa.py       SPSA による重みの自動調整
   engine24.py        持将棋 (合意) 用。数え方が違う別ルール
+mini24/       入玉宣言法専用ミニエンジン (Rust)。宣言勝ちの証明探索 (df-pn) + 残り手数。USI 対応
 tools/        データセット構築と解析
   make_conformance.py        適合性テスト集合の生成 (合成。宣言すれば負ける陰性側)
   fetch_conformance_real.py  同 (実戦由来の陽性側。HuggingFace から層化サンプリング)

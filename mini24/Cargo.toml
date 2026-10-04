@@ -1,0 +1,15 @@
+[package]
+name = "nyugyoku-mini"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "入玉宣言法 (24点法/27点法) 専用のミニエンジン。宣言勝ちの証明探索 (df-pn) と残り手数による指し手選択"
+
+[dependencies]
+# 合法手生成 (打ち歩詰め込み)・手の実行/取り消し・Zobrist
+shunsai = "0.1.2"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"

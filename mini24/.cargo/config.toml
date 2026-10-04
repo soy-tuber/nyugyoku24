@@ -1,0 +1,4 @@
+# POPCNT を使う (敵陣の枚数・点数をビットボードの popcount で数えるため)。
+# x86-64-v2 は 2009年以降のほぼすべての x86-64 CPU が満たす
+[target.'cfg(target_arch = "x86_64")']
+rustflags = ["-C", "target-cpu=x86-64-v2"]
