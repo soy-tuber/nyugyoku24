@@ -39,16 +39,45 @@ W_N = 25        # 敵陣三段目以内の駒数 (10枚まで)
 W_POT = 12      # 持ち駒 = 1手で敵陣に届く予備の駒
 W_N_X = 6       # 10枚を超えた分
 W_KING = 400    # 玉が敵陣にいることは宣言の前提条件
+W_ADV = 0.8     # 取り残し (敵陣外の自駒) の前進。1段近づくごとに 駒点 x W_ADV
+                # 敵陣の1段手前でも 5 x W_ADV x 駒点 = 飛角で20 < W_N なので、
+                # 敵陣に入る手が常に得になる (宣言点数が31で飽和した後も)
+
+# 敵陣外のマスから敵陣三段目までの段数 (1..6)。敵陣内は 0。
+# cshogi の square は (筋-1)*9 + (段-1)。先手の敵陣 = 1〜3段目。
+ZONE_DIST = {
+    cshogi.BLACK: [max(0, sq % 9 - 2) for sq in range(81)],
+    cshogi.WHITE: [max(0, 6 - sq % 9) for sq in range(81)],
+}
 
 
 def full_stats(board, color):
     """(owned, declarable, n, hand_cnt, king_in) を返す。"""
+    return _stats(board, color)[:5]
+
+
+def _stats(board, color):
+    """full_stats に加えて adv (取り残しの前進度) を返す。
+
+    adv = 敵陣外の自駒について 駒点 x (6 - 敵陣までの段数) の和。
+    宣言点数は敵陣に入った瞬間にしか動かないので、敵陣まで3手以上かかる
+    取り残しは浅い探索では評価が平坦になり、運び込まれない (地平線効果)。
+    2026-10-04 の floodgate 局 (miao-R vs Sense) から始めた自己対局で、
+    所有32点・敵陣22枚・宣言30点のまま 自陣の歩2枚を残して250手停滞した。
+    これを段数の勾配で埋める。
+
+    減点 (遠いほどマイナス) ではなく加点にしている理由:
+    減点だと、取り残しを相手に取らせれば減点ごと消えるので
+    「遠くの駒を捨てる」手が得に見えてしまう。加点なら駒を失うと加点も失う。
+    """
     pieces = board.pieces
     is_white = (color == cshogi.WHITE)
     zone = ZONE[color]
     owned = 0
     zone_pts = 0
     n = 0
+    adv = 0
+    dist = ZONE_DIST[color]
     for sq in range(81):
         pc = pieces[sq]
         if not pc or (pc >= 17) != is_white:
@@ -61,6 +90,8 @@ def full_stats(board, color):
         if sq in zone:
             zone_pts += v
             n += 1
+        else:
+            adv += v * (6 - dist[sq])
     hand_pts = 0
     hand_cnt = 0
     for i, c in enumerate(board.pieces_in_hand[color]):
@@ -69,11 +100,11 @@ def full_stats(board, color):
             hand_cnt += c
     owned += hand_pts
     king_in = board.king_square(color) in zone
-    return owned, zone_pts + hand_pts, n, hand_cnt, king_in
+    return owned, zone_pts + hand_pts, n, hand_cnt, king_in, adv
 
 
 def value(board, color):
-    owned, dec, n, h, king_in = full_stats(board, color)
+    owned, dec, n, h, king_in, adv = _stats(board, color)
     have = min(n, NEED_N)
     reach = min(NEED_N, n + h)
     v = (W_OWN * min(owned, WIN_POINT)          # 第1段階: 駒取り。31で飽和
@@ -81,7 +112,8 @@ def value(board, color):
          + W_DEC * min(dec, WIN_POINT)          # 第2段階: 変換
          + W_N * have
          + W_POT * (reach - have)
-         + W_N_X * max(0, n - NEED_N))
+         + W_N_X * max(0, n - NEED_N)
+         + int(W_ADV * adv))
     if king_in:
         v += W_KING
     return v
