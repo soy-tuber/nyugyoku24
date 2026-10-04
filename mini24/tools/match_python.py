@@ -17,7 +17,7 @@ import cshogi
 from engine_decl24 import declaration
 from engine_unified import UnifiedEngine, full_stats
 
-BIN = os.path.join(HERE, '..', 'target', 'release', 'nyugyoku-mini')
+BIN = os.environ.get('MINI_BIN') or os.path.join(HERE, '..', 'target', 'release', 'nyugyoku-mini')
 
 
 class Usi:

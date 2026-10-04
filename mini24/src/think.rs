@@ -35,7 +35,7 @@ impl Default for Config {
             rule: Rule::Law24,
             max_moves: 512,
             proof_nodes: 20_000,
-            safety_nodes: 200,
+            safety_nodes: 2_000,
             time: None,
         }
     }
@@ -104,9 +104,9 @@ pub fn think(pos: &mut Position, history: &[u64], cfg: &Config) -> (Decision, In
         return (Decision::DeclareWin, info);
     }
 
-    // 持ち時間: 問い1に6割、問い2に残りを使う。問い3は軽い
+    // 持ち時間: 問い1に4割、問い2に残りを使う
     let start = Instant::now();
-    let proof_deadline = cfg.time.map(|t| start + t.mul_f64(0.6));
+    let proof_deadline = cfg.time.map(|t| start + t.mul_f64(0.4));
     let safety_deadline = cfg.time.map(|t| start + t.mul_f64(0.95));
 
     // 1. 自分の宣言勝ちの証明
@@ -126,42 +126,58 @@ pub fn think(pos: &mut Position, history: &[u64], cfg: &Config) -> (Decision, In
         Proof::Unknown => {}
     }
 
-    // 2 + 3. 相手に宣言勝ちを強制されない手の中で、競走の点数が最大の手
+    // 3. 先に全候補手を競走の点数で並べる (軽い)
     let us = pos.side_to_move();
-    let moves = pos.legal_moves();
-    if moves.is_empty() {
+    let mut scored: Vec<(i32, Move)> = pos
+        .legal_moves()
+        .into_iter()
+        .map(|mv| {
+            let u = pos.do_move(mv);
+            let sc = score_after_captures(pos, us, cfg);
+            pos.undo_move(mv, u);
+            (sc, mv)
+        })
+        .collect();
+    if scored.is_empty() {
         return (Decision::Resign, info);
     }
+    scored.sort_by_key(|&(sc, _)| std::cmp::Reverse(sc));
+
+    // 2. 点数の高い順に「相手に宣言勝ち (または詰み) を強制されないか」を調べ、
+    //    最初に安全と分かった手を指す。全候補を調べると時間切れで安全確認が
+    //    丸ごと省かれ、短手数で詰まされた (Python 版との対局で後手番に多発)
     let mut hist = history.to_vec();
     prover.deadline = safety_deadline;
-    let mut best: Option<(bool, i32, Move)> = None;
-    for mv in moves {
-        let u = pos.do_move(mv);
-        hist.push(pos.key());
-        // 時間切れ後は安全確認を省く (予算0で即 Unknown = 安全とみなす)
-        let budget = if safety_deadline.is_some_and(|d| Instant::now() >= d) {
-            0
+    const MIN_CHECKED: usize = 3; // 時間切れでも上位3手は小予算で確認する
+    for (i, &(sc, mv)) in scored.iter().enumerate() {
+        let late = safety_deadline.is_some_and(|d| Instant::now() >= d);
+        if late && i >= MIN_CHECKED {
+            break;
+        }
+        // 締め切り後の上位3手は、締め切りを外して小予算で調べる
+        let budget = if late {
+            cfg.safety_nodes.min(300)
         } else {
             cfg.safety_nodes
         };
-        let unsafe_ = budget > 0
-            && matches!(
-                prover.prove(pos, &hist, budget),
-                Proof::Declare | Proof::Move(_)
-            );
+        prover.deadline = if late { None } else { safety_deadline };
+        let u = pos.do_move(mv);
+        hist.push(pos.key());
+        let threatened = matches!(
+            prover.prove(pos, &hist, budget),
+            Proof::Declare | Proof::Move(_)
+        );
         info.expansions += prover.expansions;
-        let score = score_after_captures(pos, us, cfg);
         hist.pop();
         pos.undo_move(mv, u);
-        if unsafe_ {
-            info.unsafe_moves += 1;
+        if !threatened {
+            info.score = sc;
+            return (Decision::Move(mv), info);
         }
-        let key = (!unsafe_, score);
-        if best.is_none_or(|(s, v, _)| key > (s, v)) {
-            best = Some((!unsafe_, score, mv));
-        }
+        info.unsafe_moves += 1;
     }
-    let (_, score, mv) = best.unwrap();
-    info.score = score;
+    // 調べた手がすべて危険か、時間切れ: 調べていない手のうち最上位、なければ最上位
+    let (sc, mv) = scored.get(info.unsafe_moves).copied().unwrap_or(scored[0]);
+    info.score = sc;
     (Decision::Move(mv), info)
 }

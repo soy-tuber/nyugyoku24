@@ -172,7 +172,7 @@ fn usi_loop() {
                 .ok();
                 writeln!(
                     out,
-                    "option name SafetyNodes type spin default 200 min 0 max 1000000"
+                    "option name SafetyNodes type spin default 2000 min 0 max 1000000"
                 )
                 .ok();
                 writeln!(out, "usiok").ok();
