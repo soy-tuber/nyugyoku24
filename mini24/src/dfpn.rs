@@ -60,6 +60,14 @@ const TEMPO_CAP: u16 = 64;
 /// 埋もれ、T を縮める手と縮めない手 (例: 宣言点数が足りないのに持ち駒を打つ) の
 /// 区別がつかなくなって、攻め方の100通り近い手を横に舐め続ける。
 const TEMPO_SCALE: u32 = 16;
+/// 王手されている局面の初期値は「受けの数 x CHECK_SCALE」で頭打ちにする。
+/// 詰将棋ソルバーと同じく、受けの少ない王手ほど詰みに近いとみなす。
+/// これが無いと、宣言には遠いが1手で詰む手を優先できず、1手詰めすら見逃した
+/// (Python 版との対局で後手番が11手・25手で詰まされた)
+const CHECK_SCALE: u32 = 4;
+
+const PROVEN: Entry = Entry { pn: 0, dn: INF };
+const DISPROVEN: Entry = Entry { pn: INF, dn: 0 };
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Proof {
@@ -170,8 +178,6 @@ impl Prover {
 
     /// 展開せずに分かる終端。千日手は呼び出し側で見る。
     fn terminal(&self, pos: &Position) -> Option<Entry> {
-        const PROVEN: Entry = Entry { pn: 0, dn: INF };
-        const DISPROVEN: Entry = Entry { pn: INF, dn: 0 };
         let d = declaration(pos, self.rule);
         if pos.side_to_move() == self.attacker {
             if d == DeclResult::Win {
@@ -213,8 +219,31 @@ impl Prover {
         if let Some(e) = self.tt.get(&key) {
             return *e;
         }
-        let e = self.terminal(pos).unwrap_or_else(|| self.heuristic(pos));
+        let e = self.init(pos);
         self.tt.insert(key, e);
+        e
+    }
+
+    /// 未展開の節点の初期値。終端ならその値、王手なら受けの数も見る。
+    fn init(&self, pos: &Position) -> Entry {
+        if let Some(e) = self.terminal(pos) {
+            return e;
+        }
+        let mut e = self.heuristic(pos);
+        if pos.in_check() {
+            // 王手の受けだけなので合法手は少なく、生成しても安い
+            let n = pos.legal_moves().len() as u32;
+            let is_or = pos.side_to_move() == self.attacker;
+            if n == 0 {
+                return if is_or { DISPROVEN } else { PROVEN }; // 詰み
+            }
+            let cap = 1 + CHECK_SCALE * n;
+            if is_or {
+                e.dn = e.dn.min(cap); // 攻め方が王手されている: 詰まされる (= 反証) に近い
+            } else {
+                e.pn = e.pn.min(cap); // 受け方が王手されている: 詰ます (= 証明) に近い
+            }
+        }
         e
     }
 
@@ -230,11 +259,7 @@ impl Prover {
         let moves = pos.legal_moves();
         if moves.is_empty() {
             // 詰み: 攻め方が詰まされたら反証、受け方が詰まされたら証明
-            let e = if is_or {
-                Entry { pn: INF, dn: 0 }
-            } else {
-                Entry { pn: 0, dn: INF }
-            };
+            let e = if is_or { DISPROVEN } else { PROVEN };
             self.tt.insert(key, e);
             return (e.pn, e.dn);
         }
@@ -302,6 +327,7 @@ impl Prover {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::rules::DeclPoints;
     use crate::sfen::parse_sfen;
 
     fn prove(sfen: &str, limit: u64) -> Proof {
@@ -342,12 +368,41 @@ mod tests {
         }
     }
 
+    /// 宣言には遠いが1手で詰む局面。詰みを子の初期化で判定しないと見逃した (回帰テスト)
     #[test]
-    fn unreachable_points_cannot_be_proven() {
-        // 所有30点では31点に届かない
+    fn finds_mate_in_one() {
+        let sfen = "1+R6K/5G3/3+P3+B1/2p6/+R1sp5/s3PP3/k2S5/6p+n1/2+p6 b B2GS2N3L9Pgnl2p 243";
+        match prove(sfen, 50) {
+            Proof::Move(m) => assert_eq!(crate::sfen::move_to_usi(m), "G*8h"),
+            p => panic!("{p:?}"),
+        }
+    }
+
+    /// 所有30点で宣言には届かないが、玉1枚の後手は詰ませられる。詰みも勝ちとして証明される。
+    /// 証明手を指した後、後手のすべての応手に対して再び証明できることで検算する。
+    #[test]
+    fn mate_counts_as_win_and_proof_is_consistent() {
+        let sfen = "RRBB+P+P+P+P+P/+P8/4K4/9/9/9/8k/9/9 b 4P 1";
+        let mut pos = parse_sfen(sfen).unwrap();
+        let p = crate::tempo::plan(&pos, Color::Black);
         assert_eq!(
-            prove("RRBB+P+P+P+P+P/+P8/4K4/9/9/9/8k/9/9 b 4P 1", 2000),
-            Proof::Unknown
+            crate::tempo::tempo(&p, DeclPoints(31)),
+            crate::tempo::UNREACHABLE
         );
+        let Proof::Move(m) = prove(sfen, 5000) else {
+            panic!("証明できない")
+        };
+        let _ = pos.do_move(m);
+        let mut prover = Prover::new(Rule::Law24, 512);
+        for reply in pos.legal_moves() {
+            let u = pos.do_move(reply);
+            let h = vec![pos.key()];
+            let r = prover.prove(&mut pos, &h, 20_000);
+            assert!(
+                matches!(r, Proof::Move(_) | Proof::Declare),
+                "応手 {reply:?} の後に証明できない"
+            );
+            pos.undo_move(reply, u);
+        }
     }
 }

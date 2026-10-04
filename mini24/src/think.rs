@@ -82,16 +82,21 @@ fn race_score(pos: &Position, us: Color, cfg: &Config) -> i32 {
     RACE * (t(them) as i32 - t(us) as i32) + OWN * (own(us) - own(them))
 }
 
-/// 相手の駒取りの応手を1手だけ読んだ最悪値。
-fn score_after_captures(pos: &mut Position, us: Color, cfg: &Config) -> i32 {
+/// 相手の応手を1手だけ読んだ最悪値。読むのは駒取りと、過去の局面に戻る手 (千日手) だけ。
+///
+/// 劣勢の相手は千日手 (引き分け) に逃げられるなら逃げる。自分の手の直後が新しい局面でも、
+/// 相手の応手で過去の局面に戻れるなら、その手の価値は高々0。これを見ないと、
+/// 優勢なのに相手に千日手で逃げられた (Python 版との対局で20局中5局、最短6手)。
+fn score_after_replies(pos: &mut Position, us: Color, history: &[u64], cfg: &Config) -> i32 {
     let mut worst = race_score(pos, us, cfg);
     for mv in pos.legal_moves() {
         let is_capture = matches!(mv, Move::Normal { to, .. } if pos.piece_at(to).is_some());
-        if !is_capture {
-            continue;
-        }
         let u = pos.do_move(mv);
-        worst = worst.min(race_score(pos, us, cfg));
+        if history.contains(&pos.key()) {
+            worst = worst.min(0);
+        } else if is_capture {
+            worst = worst.min(race_score(pos, us, cfg));
+        }
         pos.undo_move(mv, u);
     }
     worst
@@ -126,14 +131,19 @@ pub fn think(pos: &mut Position, history: &[u64], cfg: &Config) -> (Decision, In
         Proof::Unknown => {}
     }
 
-    // 3. 先に全候補手を競走の点数で並べる (軽い)
+    // 3. 先に全候補手を競走の点数で並べる (軽い)。
+    //    千日手 (過去の局面に戻る) は引き分け = 0 として扱う: 優勢なら避け、劣勢なら選ぶ
     let us = pos.side_to_move();
     let mut scored: Vec<(i32, Move)> = pos
         .legal_moves()
         .into_iter()
         .map(|mv| {
             let u = pos.do_move(mv);
-            let sc = score_after_captures(pos, us, cfg);
+            let sc = if history.contains(&pos.key()) {
+                0
+            } else {
+                score_after_replies(pos, us, history, cfg)
+            };
             pos.undo_move(mv, u);
             (sc, mv)
         })

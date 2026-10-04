@@ -220,6 +220,7 @@ pub fn tempo(p: &Plan, target: DeclPoints) -> u16 {
 
 /// 一般のナップサックの動的計画法による参照実装 (テスト用)。
 #[cfg(test)]
+#[allow(clippy::needless_range_loop)]
 fn tempo_reference(p: &Plan, target: DeclPoints) -> u16 {
     if p.stats.owned.0 < target.0 {
         return UNREACHABLE;
